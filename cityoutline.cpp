@@ -95,26 +95,51 @@ class Outline {
 
 			return response;
 		}
-		int intersection(Outline a) {
-			int response;
+		// string intersection(Outline a) {
+		// 	string response;
+
+		// 	if(intersects(a)) {
+		// 		if(x1() > a.x1()) {
+		// 			if(height() < a.height()) {
+		// 				response = to_string(a.x2()) + "," + to_string(a.height());
+		// 			} else {
+		// 				response = to_string(x1()) + "," + to_string(height());
+		// 			}
+		// 		} else {
+		// 			if(height() < a.height()) {
+		// 				response = to_string(a.x1()) + "," + to_string(a.height());
+		// 			} else {
+		// 				response = to_string(x2()) + "," + to_string(height());
+		// 			}
+		// 		}
+
+		// 	} else {
+		// 		response = "";
+		// 	}
+
+		// 	//returns intersection at height change
+		// 	return response;
+		// }
+		string intersection(Outline a) {
+			string response;
 
 			if(intersects(a)) {
-				if(x1() > a.x1()) {
+				if(x1() > a.x1()) { //if x of the called outline is greater than the passed outline
 					if(height() < a.height()) {
-						response = a.x2();
+						response = to_string(a.x2()) + "," + to_string(height());
 					} else {
-						response = x1();
+						response = to_string(x1()) + "," + to_string(a.height());
 					}
 				} else {
 					if(height() < a.height()) {
-						response = a.x1();
+						response = to_string(a.x1()) + "," + to_string(a.height());
 					} else {
-						response = x2();
+						response = to_string(x2()) + "," + to_string(a.height());
 					}
 				}
 
 			} else {
-				response = -1;
+				response = "";
 			}
 
 			//returns intersection at height change
@@ -160,7 +185,22 @@ vector<Outline> sortoutlines(vector<Outline>& a) {
 }
 
 vector<string>* comparediff(vector<Outline> voutline) {
-	vector<string>* response;
+	vector<string> res;
+
+	res.push_back(to_string(voutline[0].x1())+","+to_string(voutline[0].height()));
+	for(int i=0;i<voutline.size()-1;i++) {
+		if(voutline[i].intersects(voutline[i+1])) {
+			string out = voutline[i].intersection(voutline[i+1]);
+
+			res.push_back(out);
+		} else {
+			res.push_back(to_string(voutline[i].x2())+",0");
+			res.push_back(to_string(voutline[i+1].x1()) + "," + to_string(voutline[i+1].height()));
+		}
+	}
+	res.push_back(to_string(voutline[voutline.size()-1].x2()) + ",0");
+
+	vector<string>* response = &res;
 
 	return response;
 }
