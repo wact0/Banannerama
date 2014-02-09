@@ -184,7 +184,7 @@ vector<Outline> sortoutlines(vector<Outline>& a) {
 	}
 }
 
-vector<string>* comparediff(vector<Outline> voutline) {
+vector<string> comparediff(vector<Outline> voutline) {
 	vector<string> res;
 
 	res.push_back(to_string(voutline[0].x1())+","+to_string(voutline[0].height()));
@@ -200,13 +200,12 @@ vector<string>* comparediff(vector<Outline> voutline) {
 	}
 	res.push_back(to_string(voutline[voutline.size()-1].x2()) + ",0");
 
-	vector<string>* response = &res;
+	// vector<string>* response = &res;
 
-	return response;
+	return res;
 }
 
 vector<string>* getOutline(vector<string>& input) {
-	vector<string> *response;
 	vector<Outline> outlines;
 
 	for(int i=0;i<input.size();i++) {
@@ -215,7 +214,9 @@ vector<string>* getOutline(vector<string>& input) {
 	}
 
 	outlines = sortoutlines(outlines);
-	response = comparediff(outlines);
+
+	vector<string> comparedoutlines = comparediff(outlines);
+	vector<string> *response = &comparedoutlines;
 
 	return response;
 
