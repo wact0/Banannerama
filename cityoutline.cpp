@@ -126,15 +126,15 @@ class Outline {
 			if(intersects(a)) {
 				if(x1() > a.x1()) { //if x of the called outline is greater than the passed outline
 					if(height() < a.height()) {
-						response = to_string(a.x2()) + "," + to_string(height());
+						response = "("+to_string(a.x2()) + "," + to_string(height())+")";
 					} else {
-						response = to_string(x1()) + "," + to_string(a.height());
+						response = "("+to_string(x1()) + "," + to_string(a.height())+")";
 					}
 				} else {
 					if(height() < a.height()) {
-						response = to_string(a.x1()) + "," + to_string(a.height());
+						response = "("+to_string(a.x1()) + "," + to_string(a.height())+")";
 					} else {
-						response = to_string(x2()) + "," + to_string(a.height());
+						response = "("+to_string(x2()) + "," + to_string(a.height())+")";
 					}
 				}
 
@@ -187,18 +187,18 @@ vector<Outline> sortoutlines(vector<Outline>& a) {
 vector<string> comparediff(vector<Outline> voutline) {
 	vector<string> res;
 
-	res.push_back(to_string(voutline[0].x1())+","+to_string(voutline[0].height()));
+	res.push_back("("+to_string(voutline[0].x1())+","+to_string(voutline[0].height())+")");
 	for(int i=0;i<voutline.size()-1;i++) {
 		if(voutline[i].intersects(voutline[i+1])) {
 			string out = voutline[i].intersection(voutline[i+1]);
 
 			res.push_back(out);
 		} else {
-			res.push_back(to_string(voutline[i].x2())+",0");
-			res.push_back(to_string(voutline[i+1].x1()) + "," + to_string(voutline[i+1].height()));
+			res.push_back("("+to_string(voutline[i].x2())+",0)");
+			res.push_back("("+to_string(voutline[i+1].x1()) + "," + to_string(voutline[i+1].height())+")");
 		}
 	}
-	res.push_back(to_string(voutline[voutline.size()-1].x2()) + ",0");
+	res.push_back("("+to_string(voutline[voutline.size()-1].x2()) + ",0)");
 
 	// vector<string>* response = &res;
 
@@ -226,7 +226,12 @@ int main() {
 	string ainit[] = {"14 8 17", "12 7 16", "11 6 14", "1 5 4", "2 8 6", "4 6 7"};
 	vector<string> vinit(ainit,ainit+6);
 
-	getOutline(vinit);
+	vector<string>* test = getOutline(vinit);
+
+	cout << test->size() << "::" << endl;
+	// for(int i=9;i<test->size();i++) {
+	// 	cout << "test" << endl;
+	// }
 
 	return 0;
 }
