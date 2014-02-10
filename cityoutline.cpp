@@ -6,6 +6,8 @@
 
 using namespace std;
 
+int longestindex = 0;
+
 int makeint(string number) {
 	int response;
 
@@ -38,7 +40,7 @@ vector<string> split(string sentence,string delimiter) {
 			}
 		}
 	}
-	
+
 	return cache;
 }
 
@@ -50,7 +52,7 @@ class Outline {
 	bool _sorted;
 	vector<Outline> _intersects;
 	vector<int> _intersections;
-	
+
 	public:
 		Outline() {
 			_sorted = false;
@@ -121,17 +123,16 @@ class Outline {
 		// 	//returns intersection at height change
 		// 	return response;
 		// }
-		string intersection(Outline a) {
+		string intersection(Outline a) { ////--
 			string response = "";
-			Outline longestend;
+
 			if(intersects(a)) {
-				// if(height() < a.height()) {
-				// 	response = "("+to_string(a.x1()) + "," + to_string(a.height())+")";
-				// } else {
-				// 	response = "("+to_string(x2()) + "," + to_string(a.height())+")";
-				// }
 
-
+				if(height() < a.height()) {
+					response = "("+to_string(a.x1()) + "," + to_string(a.height())+")";
+				} else {
+					response = "("+to_string(x2()) + "," + to_string(a.height())+")";
+				}
 			}
 
 			//returns intersection at height change
@@ -188,6 +189,9 @@ vector<string> comparediff(vector<Outline> voutline) {
 
 	res.push_back("("+to_string(voutline[0].x1())+","+to_string(voutline[0].height())+")");
 	for(int i=0;i<voutline.size()-1;i++) {
+		voutline[i].index(i);
+		voutline[i+1].index(i+1);
+
 		if(voutline[i].intersects(voutline[i+1])) {
 			string out = voutline[i].intersection(voutline[i+1]);
 
@@ -197,6 +201,7 @@ vector<string> comparediff(vector<Outline> voutline) {
 			res.push_back("("+to_string(voutline[i+1].x1()) + "," + to_string(voutline[i+1].height())+")");
 		}
 	}
+
 	res.push_back("("+to_string(voutline[voutline.size()-1].x2()) + ",0)");
 
 	// vector<string>* response = &res;
@@ -264,14 +269,14 @@ int main (int argc, char * const argv[]) {
 		switch (i) {
 			case 0:
 				input   .push_back( "0 42 6" );
-				
+
 				expected.push_back( "(0,42)" );
 				expected.push_back( "(6,0)" );
 				break;
 			case 1:
 				input   .push_back( "5 4 10" );
 				input   .push_back( "15 3 20" );
-				
+
 				expected.push_back( "(5,4)" );
 				expected.push_back( "(10,0)" );
 				expected.push_back( "(15,3)" );
@@ -290,7 +295,7 @@ int main (int argc, char * const argv[]) {
  			case 3:
 				input   .push_back( "140 4 240" );
 				input   .push_back( "90 9 190" );
-				
+
 				expected.push_back( "(90,9)" );
 				expected.push_back( "(190,4)" );
 				expected.push_back( "(240,0)" );
@@ -298,7 +303,7 @@ int main (int argc, char * const argv[]) {
 			case 4:
 				input   .push_back( "200 9 300" );
 				input   .push_back( "30 4 230" );
-				
+
 				expected.push_back( "(30,4)" );
 				expected.push_back( "(200,9)" );
 				expected.push_back( "(300,0)" );
@@ -307,7 +312,7 @@ int main (int argc, char * const argv[]) {
 				input   .push_back( "1 5 4" );
 				input   .push_back( "2 8 6" );
 				input   .push_back( "4 6 7" );
-				
+
 				expected.push_back( "(1,5)" );
 				expected.push_back( "(2,8)" );
 				expected.push_back( "(6,6)" );
@@ -317,7 +322,7 @@ int main (int argc, char * const argv[]) {
 				input   .push_back( "14 8 17" );
 				input   .push_back( "12 7 16" );
 				input   .push_back( "11 6 14" );
-				
+
 				expected.push_back( "(11,6)" );
 				expected.push_back( "(12,7)" );
 				expected.push_back( "(14,8)" );
@@ -330,7 +335,7 @@ int main (int argc, char * const argv[]) {
 				input   .push_back( "1 5 4" );
 				input   .push_back( "2 8 6" );
 				input   .push_back( "4 6 7" );
-				
+
 				expected.push_back( "(1,5)" );
 				expected.push_back( "(2,8)" );
 				expected.push_back( "(6,6)" );
@@ -344,7 +349,7 @@ int main (int argc, char * const argv[]) {
 				input   .push_back( "5 2 7" );
 				input   .push_back( "3 5 8" );
 				input   .push_back( "1 8 9" );
-				
+
 				expected.push_back( "(1,8)" );
 				expected.push_back( "(9,0)" );
 				break;
@@ -357,7 +362,7 @@ int main (int argc, char * const argv[]) {
 				input   .push_back( "19 18 22" );
 				input   .push_back( "23 13 29" );
 				input   .push_back( "24 4 28" );
-				
+
 				expected.push_back( "(1,11)" );
 				expected.push_back( "(3,13)" );
 				expected.push_back( "(9,0)" );
