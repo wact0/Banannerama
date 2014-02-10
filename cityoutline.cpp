@@ -1,12 +1,23 @@
+//Juan Vallejo 50%, Dustin Smith 50%
+
 #include <iostream>
 #include <string>
 #include <vector>
 #include <sstream>
 #include <iomanip>
+#include <cstring>
 
 using namespace std;
 
-int longestindex = 0;
+int lindex = 0;
+
+string to_str(int a) {
+	stringstream ss;
+	ss << a;
+	string str = ss.str();
+
+	return str;
+}
 
 int makeint(string number) {
 	int response;
@@ -50,6 +61,7 @@ class Outline {
 	int _height;
 	int _index;
 	bool _sorted;
+	bool _nested;
 	vector<Outline> _intersects;
 	vector<int> _intersections;
 
@@ -91,49 +103,31 @@ class Outline {
 		}
 		bool intersects(Outline a) {
 			bool response = false;
-
-			if((a.x1() >= x1() && a.x1() <= x2()) || (a.x2() >= x1() && a.x2() <= x2())) {
+			if((a.x1() > x1() && a.x1() <= x2()) || (a.x2() >= x1() && a.x2() <= x2())) {
 				response = true;
 			}
-
 			return response;
 		}
-		// string intersection(Outline a) {
-		// 	string response;
-
-		// 	if(intersects(a)) {
-		// 		if(x1() > a.x1()) { //if x of the called outline is greater than the passed outline
-		// 			if(height() < a.height()) {
-		// 				response = "("+to_string(a.x2()) + "," + to_string(height())+")";
-		// 			} else {
-		// 				response = "("+to_string(x1()) + "," + to_string(a.height())+")";
-		// 			}
-		// 		} else {
-		// 			if(height() < a.height()) {
-		// 				response = "("+to_string(a.x1()) + "," + to_string(a.height())+")";
-		// 			} else {
-		// 				response = "("+to_string(x2()) + "," + to_string(a.height())+")";
-		// 			}
-		// 		}
-
-		// 	} else {
-		// 		response = "";
-		// 	}
-
-		// 	//returns intersection at height change
-		// 	return response;
-		// }
 		string intersection(Outline a) { ////--
 			string response = "";
 
-			if(intersects(a)) {
+			// if(checking to see that it is contained) {
 
-				if(height() < a.height()) {
-					response = "("+to_string(a.x1()) + "," + to_string(a.height())+")";
-				} else {
-					response = "("+to_string(x2()) + "," + to_string(a.height())+")";
+			// } else {
+				if(intersects(a)) {
+					//should only be the case if it's not contained inside a bigger one
+					if(height() < a.height()) {
+						response = "("+to_str(a.x1()) + "," + to_str(a.height())+")";
+					} else {
+						////--
+						if(a.x2() > x2()) {
+							response = "("+to_str(x2()) + "," + to_str(a.height())+")";
+						} else {
+							response = "(nested)";
+						}
+					}
 				}
-			}
+			// }
 
 			//returns intersection at height change
 			return response;
@@ -143,6 +137,12 @@ class Outline {
 		}
 		void sorted(bool a) {
 			_sorted = a;
+		}
+		bool nested() {
+			return _nested;
+		}
+		void nested(bool a) {
+			_nested = a;
 		}
 		int index() {
 			return _index;
@@ -185,25 +185,61 @@ vector<Outline> sortoutlines(vector<Outline>& a) {
 }
 
 vector<string> comparediff(vector<Outline> voutline) {
-	vector<string> res;
+	vector<string> res; ////--
 
-	res.push_back("("+to_string(voutline[0].x1())+","+to_string(voutline[0].height())+")");
+	res.push_back("("+to_str(voutline[0].x1())+","+to_str(voutline[0].height())+")");
 	for(int i=0;i<voutline.size()-1;i++) {
+		bool doadd = true;
 		voutline[i].index(i);
-		voutline[i+1].index(i+1);
+
+		if(i == 0 || voutline[i].x2() > voutline[lindex].x2()) {
+			lindex = i;
+		} else {
+			voutline[i].nested(true);
+		}
+
+		if(i < voutline.size() - 2 && voutline[i].intersects(voutline[i+1]) && voutline[i+1].intersects(voutline[i+2]) && voutline[i].intersects(voutline[i+2]) && voutline[i+1].height() < voutline[i+2].height() && voutline[i+1].height() < voutline[i].height()) {
+			doadd = false;
+		}
 
 		if(voutline[i].intersects(voutline[i+1])) {
-			string out = voutline[i].intersection(voutline[i+1]);
-
-			res.push_back(out);
+			if(doadd) {
+				if(!voutline[i].nested()) {
+					string out = voutline[i].intersection(voutline[i+1]);
+					if(out != "(nested)") {
+						res.push_back(out);
+					}
+				}
+			}
 		} else {
-			res.push_back("("+to_string(voutline[i].x2())+",0)");
-			res.push_back("("+to_string(voutline[i+1].x1()) + "," + to_string(voutline[i+1].height())+")");
+			//make sure it is not contained
+			if(voutline[i].x2() < voutline[i-1].x2()) {
+				if(i == lindex) {
+					res.push_back("("+to_str(voutline[i].x2())+",0)");
+				} else {
+					res.push_back("("+to_str(voutline[i].x2())+","+to_str(voutline[lindex].height())+")");
+				}
+			} else {
+				res.push_back("("+to_str(voutline[i].x2())+",0)");
+			}
+
+			res.push_back("("+to_str(voutline[i+1].x1()) + "," + to_str(voutline[i+1].height())+")");
 		}
 	}
+	// res.push_back("("+to_str(voutline[voutline.size()-1].x2()) + ",0)");
+	if(voutline[voutline.size()-1].x2() > voutline[lindex].x2()) {
+		lindex = voutline.size()-1;
+	} else {
+		voutline[voutline.size()-1].nested(true);
+	}
 
-	res.push_back("("+to_string(voutline[voutline.size()-1].x2()) + ",0)");
+	if(voutline[voutline.size()-1].nested()) {
+		res.push_back("("+to_str(voutline[lindex].x2()) + ",0)");
+	} else {
+		res.push_back("("+to_str(voutline[voutline.size()-1].x2()) + ",0)");
+	}
 
+	// cout << "lindex = " << lindex << " and lindex height = " << voutline[lindex].height() << endl;
 	// vector<string>* response = &res;
 
 	return res;
@@ -218,7 +254,7 @@ vector<string>* getOutline(vector<string>& input) {
 		outlines.push_back(numbers);
 	}
 
-	outlines = sortoutlines(outlines); ////--
+	outlines = sortoutlines(outlines);
 
 	vector<string> comparedoutlines = comparediff(outlines);
 
@@ -233,6 +269,13 @@ vector<string>* getOutline(vector<string>& input) {
 }
 
 void assertingEquals(int number, vector<string>& actual, vector<string>& expected) {
+	//debug indivivdual tests
+	if(number == 9) {
+		for(int i=0;i<actual.size();i++) {
+			// cout << actual[i] << endl;
+		}
+	}
+	//end debug
 	bool failed = false;
 	cout << "case " << setw(2) << number << ": ";
 	for (int i = 0; i < expected.size(); i++) {
